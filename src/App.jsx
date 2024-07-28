@@ -17,16 +17,14 @@ const App = () => {
     label: "English",
   });
 
-  const [text, setText] = useState();
+  const [text, setText] = useState("");
 
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getLanguages());
-  }, []);
+  }, [dispatch]);
 
-  // apidan gelen diziyi bizden istenilen formata çevirmek
-  // nesnelerin code ve name değerilerini label ve value'ya çevirdik
   const formatted = useMemo(
     () =>
       langState.languages?.map((i) => ({
@@ -41,17 +39,18 @@ const App = () => {
   };
 
   const handleSwap = () => {
-    // select alanlarındaki veirleri yer değiş
     setSourceLang(targetLang);
     setTargetLang(sourceLang);
-
-    // store'daki veriyi state'e aktar
     setText(translateState.answer);
-
-    // state'deki veriyi store'a  aktar
     dispatch(setAnswer(text));
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleTranslate();
+    }
+  };
   return (
     <div className="bg-red-500 min-h-screen text-white grid place-items-center">
       <div className="w-[80vw] max-w-[1100px] flex flex-col justify-center">
@@ -86,17 +85,18 @@ const App = () => {
           />
         </div>
 
-        <div className="flex mt-5 gap-3 md:gap-[105px] max-md:flex-col  ">
+        <div className="flex mt-5 gap-3 md:gap-[105px] max-md:flex-col">
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onKeyPress={handleKeyPress}
             className="w-full min-h-[300px] max-h-[500px] p-[10px] text-[20px] rounded text-black"
           />
 
           <div className="w-full relative">
             <textarea
               disabled
-              className="w-full min-h-[300px] max-h-[500px] p-[10px] text-[20px] rounded  text-black bg-white "
+              className="w-full min-h-[300px] max-h-[500px] p-[10px] text-[20px] rounded text-black bg-white"
               value={translateState.answer}
             />
 
@@ -110,7 +110,7 @@ const App = () => {
 
         <button
           onClick={handleTranslate}
-          className="rounded-md py-3 px-5 text-[17px] font-semibold cursor-pointer bg-blue-500	 mt-3 hover:ring-2 hover:bg-blue-700 transition"
+          className="rounded-md py-3 px-5 text-[17px] font-semibold cursor-pointer bg-blue-500 mt-3 hover:ring-2 hover:bg-blue-700 transition"
         >
           Çevir
         </button>
